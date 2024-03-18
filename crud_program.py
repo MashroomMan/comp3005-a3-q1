@@ -16,6 +16,24 @@ password = "postgres"
 # Global that connect my application to postgres database
 connect = psycopg.connect(f"host={host} port={port} dbname={database} user={user} password={password}")
 
+def init_database():
+
+    connect.execute(""" DROP TABLE IF EXISTS students""")
+
+    connect.execute("""create table students
+    (student_id			SERIAL, 
+     first_name			TEXT not null, 
+     last_name			TEXT not null, 
+     email				TEXT not null UNIQUE,
+	 enrollment_date	DATE,
+     primary key (student_id)
+    );""")
+
+    connect.execute("""INSERT INTO students (first_name, last_name, email, enrollment_date) 
+                    VALUES ('John', 'Doe', 'john.doe@example.com', '2023-09-01'),
+                    ('Jane', 'Smith', 'jane.smith@example.com', '2023-09-01'),
+                    ('Jim', 'Beam', 'jim.beam@example.com', '2023-09-02');""")
+
 # Finds all students in the database and iterates over the student data to display their content
 def getAllStudents():
     students = connect.cursor().execute("SELECT * FROM students").fetchall()
@@ -44,6 +62,8 @@ def deleteStudent(student_id):
 
 def main():
 
+    init_database()
+
     flag = True
     while(flag):
 
@@ -62,27 +82,38 @@ def main():
             case '1':
                 getAllStudents()
             case '2':
-                info = input("(First Name) (Last Name) (Email) (Date) [SPACE SEPERATED]: ")
-                info_list = info.split(" ")
-                addStudent(info_list[0], info_list[1], info_list[2], info_list[3])
-                print("Successfully added student!")
+                info = input("(First Name) (Last Name) (Email) (Date)[YYYY-MM-DD] [SPACE SEPERATED]: ")
+                info_list = [elem for elem in info.split(" ") if elem != ""]
+                try:
+                    addStudent(info_list[0], info_list[1], info_list[2], info_list[3])
+                    print("Successfully added student!")
+                except Exception as error:
+                    print("We encountered an error. Make sure each argument exists, and the date is formatted accordingly.")
             case '3':
                 info = input("(Student Id) (Email) [SPACE SEPERATED]: ")
-                info_list = info.split(" ")
-                updateStudentEmail(int(info_list[0]), info_list[1])
-                print("Successfully updated student!")
+                info_list = [elem for elem in info.split(" ") if elem != ""]
+                try:
+                    updateStudentEmail(int(info_list[0]), info_list[1])
+                    print("Successfully updated student!")
+                except Exception as error:
+                    print("We encountered an error. Make sure each argument exists.")
+
             case '4':
-                info = int(input("(Student Id): "))
-                deleteStudent(info)
-                print("Successfully deleted student!")
+                try:
+                    info = int(input("(Student Id) [Integer]: "))
+                    deleteStudent(info)
+                    print("Successfully deleted student!")
+                except Exception as error:
+                    print("We encountered an error. Make sure each argument exists.")
             case '5':
-                exit()
+                break
 
 
     # commits the changes to the database, effectively updating the database if needed
     connect.commit()
     # closes the connection between the application and the database
     connect.close()
+    print("Terminated")
 
 
 
