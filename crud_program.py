@@ -104,7 +104,7 @@ def main():
                     deleteStudent(info)
                     print("Successfully deleted student!")
                 except Exception as error:
-                    print("We encountered an error. Make sure each argument exists.")
+                    print("We encountered an error. Make sure each argument is valid.")
             case '5':
                 break
 
