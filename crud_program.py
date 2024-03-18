@@ -89,6 +89,7 @@ def main():
                     print("Successfully added student!")
                 except Exception as error:
                     print("We encountered an error. Make sure each argument exists, and the date is formatted accordingly.")
+                    connect.rollback()
             case '3':
                 info = input("(Student Id) (Email) [SPACE SEPERATED]: ")
                 info_list = [elem for elem in info.split(" ") if elem != ""]
@@ -97,6 +98,7 @@ def main():
                     print("Successfully updated student!")
                 except Exception as error:
                     print("We encountered an error. Make sure each argument exists.")
+                    connect.rollback()
 
             case '4':
                 try:
@@ -105,6 +107,7 @@ def main():
                     print("Successfully deleted student!")
                 except Exception as error:
                     print("We encountered an error. Make sure each argument is valid.")
+                    connect.rollback()
             case '5':
                 break
 
@@ -113,8 +116,6 @@ def main():
     connect.commit()
     # closes the connection between the application and the database
     connect.close()
-    print("Terminated")
-
 
 
 if __name__ == "__main__":
